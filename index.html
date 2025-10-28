@@ -1,4 +1,635 @@
-<!DOCTYPE html>
+// Erstelle professionelles HTML-Angebot mit editierbaren Feldern
+    <div class="recipient">
+        <strong>${firmenname}</strong>
+        ${ansprechpartner ? ansprechpartner + '<br>' : ''}
+        ${strasse ? strasse + '<br>' : ''}
+        ${plz || ort ? (plz + ' ' + ort).trim() : ''}
+    </div>
+
+    <div class="meta-info">
+        <div><strong>Angebotsnummer:</strong> ${angebotsnr}</div>
+        <div><strong>Datum:</strong> ${datumStr}</div>
+        <div><strong>Gültig bis:</strong> ${new Date(heute.getTime() + 30*24*60*60*1000).toLocaleDateString('de-DE')}</div>
+        <div><strong>Ihr Jahresumsatz:</strong> ${umsatz.toLocaleString('de-DE')} €</div>
+    </div>
+
+    <h1>Individuelles Angebot für Buchhaltungsdienstleistungen</h1>
+
+    <div class="intro">
+        <div contenteditable="true">
+            <p><strong>Sehr geehrte Damen und Herren${ansprechpartner ? ', sehr geehrte/r ' + ansprechpartner : ''},</strong></p>
+            <p>vielen Dank für Ihr Interesse an unseren Dienstleistungen. Basierend auf den von Ihnen bereitgestellten Informationen zu Ihrer Unternehmensstruktur erstellen wir Ihnen gerne folgendes individuelles Angebot:</p>
+            <p><em style="color: #3b82f6; font-size: 0.9em;">💡 Tipp: Dieser Text ist editierbar - klicken Sie hinein um ihn anzupassen und auf Besonderheiten einzugehen!</em></p>
+        </div>
+    </div>
+
+    <div class="bewertung">
+        <h2>📊 Die Zusammensetzung Ihres Berechnungspreises</h2>
+        
+        <div class="explanation-box">
+            <strong>💡 So funktioniert unsere Preisberechnung:</strong><br>
+            Wir bewerten Ihr Unternehmen anhand verschiedener Kriterien. <strong>Je niedriger Ihre Punktzahl, desto besser!</strong><br>
+            Weniger Punkte bedeuten einen niedrigeren Zehntel-Satz und damit günstigere Konditionen für Sie.
+        </div>
+        
+        <div class="kriterien-grid">
+            <div class="kriterien-header">Kriterium</div>
+            <div class="kriterien-header">Status</div>
+            <div class="kriterien-header">Punkte</div>
+            
+            <div class="kriterien-row"><strong>Zulieferung vor Stichtag</strong></div>
+            <div class="kriterien-row">${state.zulieferung === 'ja' ? '<span class="status-badge status-green">Immer rechtzeitig</span>' : state.zulieferung === 'meistens' ? '<span class="status-badge status-yellow">Meistens</span>' : '<span class="status-badge status-red">Oft verspätet</span>'}</div>
+            <div class="kriterien-row">${state.zulieferung === 'ja' ? '0' : state.zulieferung === 'meistens' ? '1' : '2'} Pkt</div>
+            
+            <div class="kriterien-row"><strong>Belegformat</strong></div>
+            <div class="kriterien-row">${state.belegFormat === 'perfekt' ? '<span class="status-badge status-green">1:1 PDF</span>' : state.belegFormat === 'stapel' ? '<span class="status-badge status-yellow">Stapel</span>' : '<span class="status-badge status-red">Scan/Foto</span>'}</div>
+            <div class="kriterien-row">${state.belegFormat === 'perfekt' ? '0' : state.belegFormat === 'stapel' ? '0.5' : '2'} Pkt</div>
+            
+            <div class="kriterien-row"><strong>Bankkonten</strong></div>
+            <div class="kriterien-row">${state.bankkonten === 'eins' ? '<span class="status-badge status-green">1 Konto</span>' : state.bankkonten === 'mehrere_mit' ? '<span class="status-badge status-yellow">>1 mit API</span>' : '<span class="status-badge status-red">>1 ohne API</span>'}</div>
+            <div class="kriterien-row">${state.bankkonten === 'eins' ? '0' : state.bankkonten === 'mehrere_mit' ? '1' : '1.5'} Pkt</div>
+            
+            <div class="kriterien-row"><strong>Auslandsgeschäft</strong></div>
+            <div class="kriterien-row">${state.ausland === 'null' ? '<span class="status-badge status-green">0%</span>' : state.ausland === 'unter10' ? '<span class="status-badge status-yellow"><10%</span>' : '<span class="status-badge status-red">>10%</span>'}</div>
+            <div class="kriterien-row">${state.ausland === 'null' ? '0' : state.ausland === 'unter10' ? '1' : '1.5'} Pkt</div>
+            
+            <div class="kriterien-row"><strong>Bankumsätze</strong></div>
+            <div class="kriterien-row">${state.bankumsaetze === 'schnittstelle' ? '<span class="status-badge status-green">API</span>' : state.bankumsaetze === 'csv' ? '<span class="status-badge status-yellow">CSV</span>' : '<span class="status-badge status-red">PDF</span>'}</div>
+            <div class="kriterien-row">${state.bankumsaetze === 'schnittstelle' ? '0' : state.bankumsaetze === 'csv' ? '0.5' : '2'} Pkt</div>
+            
+            <div class="kriterien-row"><strong>Belegzusendung</strong></div>
+            <div class="kriterien-row">${state.belege === 'schnittstelle' ? '<span class="status-badge status-green">API</span>' : state.belege === 'dragdrop' ? '<span class="status-badge status-yellow">Upload</span>' : '<span class="status-badge status-red">Post/Email</span>'}</div>
+            <div class="kriterien-row">${state.belege === 'schnittstelle' ? '0' : state.belege === 'dragdrop' ? '0.5' : '1'} Pkt</div>
+        </div>
+
+        <div class="zehntel-box">
+            <div class="label">Ihr individueller Zehntel-Satz</div>
+            <div class="value">${satz}/10</div>
+            <div style="margin-top: 10px; color: #666;">
+                <strong>Gesamtpunkte: ${punkte.toFixed(1)} von 10 Punkten</strong><br>
+                <small>Je niedriger die Punktzahl, desto günstiger der Preis</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="preise">
+        <h2>💰 Ihre monatlichen Kosten</h2>
+        
+        <div class="price-overview">
+            <div class="preis-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Leistung</th>
+                            <th>Details</th>
+                            <th style="text-align: right;">Preis (netto)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Finanzbuchhaltung</strong></td>
+                            <td>
+                                Vollumfängliche Buchhaltung für Jahresumsatz ${umsatz.toLocaleString('de-DE')} €<br>
+                                <small style="color: #666;">Inkl. Umsatzsteuervoranmeldung, BWA, Kontenabstimmung</small>
+                            </td>
+                            <td style="text-align: right; font-weight: 600;">${fibu.toFixed(2)} €</td>
+                        </tr>
+                        ${state.mitLohn && state.mitarbeiterAnzahl ? `
+                        <tr>
+                            <td><strong>Lohnbuchhaltung</strong></td>
+                            <td>
+                                ${state.mitarbeiterAnzahl} Mitarbeiter × ${lohnProMA.toFixed(2)} €<br>
+                                <small style="color: #666;">Inkl. Lohnabrechnungen, Meldungen, Bescheinigungen</small>
+                            </td>
+                            <td style="text-align: right; font-weight: 600;">${lohn.toFixed(2)} €</td>
+                        </tr>
+                        ` : ''}
+                        <tr class="total-row">
+                            <td colspan="2"><strong>Gesamtsumme (netto) pro Monat</strong></td>
+                            <td style="text-align: right;" class="highlight-preis">${gesamt.toFixed(2)} €</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">zzgl. 19% MwSt.</td>
+                            <td style="text-align: right;">${(gesamt * 0.19).toFixed(2)} €</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="2"><strong>Gesamtsumme (brutto) pro Monat</strong></td>
+                            <td style="text-align: right;" class="highlight-preis">${mitMwst.toFixed(2)} €</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            ${state.mitLohn && state.mitarbeiterAnzahl ? `
+            <div class="pie-chart-container">
+                <canvas id="pieChart" width="200" height="200"></canvas>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #666;">Kostenaufteilung</p>
+            </div>
+            ` : ''}
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>Leistungsumfang:</strong>
+        <div contenteditable="true" style="border: 1px dashed #ccc; padding: 10px; border-radius: 5px; background: #f9fafb;">
+            <ul>
+                <li>Erfassung aller Geschäftsvorfälle in moderner Buchhaltungssoftware</li>
+                <li>Monatliche Erstellung von BWA (Betriebswirtschaftliche Auswertung)</li>
+                <li>Umsatzsteuer-Voranmeldungen an das Finanzamt</li>
+                <li>Jahresabschlussvorbereitung (EÜR) für Ihren Steuerberater</li>
+                ${state.mitLohn && state.mitarbeiterAnzahl ? '<li>Vollständige Lohnbuchhaltung inkl. aller Meldungen und Bescheinigungen</li>' : ''}
+                <li>Persönlicher Ansprechpartner für alle Fragen</li>
+                <li>Digitale Dokumentenverwaltung</li>
+                <li>Tagesaktuelle BWA-Auswertungen</li>
+                <li>Automatische Bankanbindung</li>
+            </ul>
+            <p style="color: #3b82f6; font-size: 0.85em; margin-top: 10px;"><em>💡 Dieser Bereich ist editierbar - Sie können Leistungen hinzufügen oder entfernen</em></p>
+        </div>
+
+        <strong style="margin-top: 30px;">Konditionen:</strong>
+        <div contenteditable="true" style="border: 1px dashed #ccc; padding: 10px; border-radius: 5px; background: #f9fafb;">
+            <ul>
+                <li><strong>Vertragslaufzeit:</strong> Unbefristet</li>
+                <li><strong>Kündigungsfrist:</strong> 4 Wochen zum Monatsende</li>
+                <li><strong>Zahlung:</strong> Monatlich im Voraus per SEPA-Lastschrift</li>
+                <li><strong>Angebot gültig:</strong> 30 Tage ab Ausstellungsdatum</li>
+                <li><strong>Unterlagen-Frist:</strong> Bis zum 5. Werktag des Folgemonats für pünktliche UStVA</li>
+                <li><strong>Plattform-Zugang:</strong> Inklusive (BWA, Belege, Steuerrücklagen)</li>
+                <li><strong>Support:</strong> Per E-Mail, WhatsApp und Plattform-Chat</li>
+            </ul>
+            <p style="color: #3b82f6; font-size: 0.85em; margin-top: 10px;"><em>💡 Dieser Bereich ist editierbar - Sie können Konditionen anpassen</em></p>
+        </div>
+
+        <p style="margin-top: 20px;">Bei Fragen oder für ein persönliches Gespräch stehen wir Ihnen gerne zur Verfügung. Wir freuen uns auf eine erfolgreiche Zusammenarbeit!</p>
+    </div>
+
+    <div class="agb-notice">
+        <strong>⚠️ Wichtiger Hinweis zu den Geschäftsbedingungen</strong>
+        <p style="margin-top: 10px;">
+            Mit Unterzeichnung dieses Angebots stimmen Sie unseren 
+            <a href="https://bilancor.de/agb" target="_blank">Allgemeinen Geschäftsbedingungen (AGB)</a> sowie dem 
+            <a href="https://bilancor.de/avv" target="_blank">Auftragsverarbeitungsvertrag (AVV)</a> zu.
+        </p>
+        <p style="margin-top: 10px; font-size: 0.9em;">
+            Bitte lesen Sie diese Dokumente aufmerksam durch. Bei Fragen stehen wir Ihnen gerne zur Verfügung.
+        </p>
+    </div>
+
+    <div class="unterschriften">
+        <div class="unterschrift">
+            <div style="font-weight: bold; margin-bottom: 10px;">Für Bilancor GmbH:</div>
+            <div class="unterschrift-line"></div>
+            <div style="margin-top: 10px;">
+                <strong>Carsten Lebtig</strong><br>
+                <small style="color: #666;">Geschäftsführer</small>
+            </div>
+            <div class="unterschrift-info">
+                <div>
+                    <label>Ort:</label>
+                    <div contenteditable="true" style="border-bottom: 1px solid #333; min-width: 150px; padding: 5px;">Berlin</div>
+                </div>
+                <div>
+                    <label>Datum:</label>
+                    <div contenteditable="true" style="border-bottom: 1px solid #333; min-width: 150px; padding: 5px;">${datumStr}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="unterschrift">
+            <div style="font-weight: bold; margin-bottom: 10px;">Für ${firmenname}:</div>
+            <div class="unterschrift-line"></div>
+            <div style="margin-top: 10px;">
+                <div contenteditable="true" style="min-height: 24px; border-bottom: 1px dashed #ccc; padding: 5px; margin-bottom: 5px;">
+                    <strong>${ansprechpartner || '[Name]'}</strong>
+                </div>
+                <small style="color: #666;">Unterschrift & Name</small>
+            </div>
+            <div class="unterschrift-info">
+                <div>
+                    <label>Ort:</label>
+                    <div contenteditable="true" style="border-bottom: 1px solid #333; min-width: 150px; padding: 5px;">${ort || '[Ort]'}</div>
+                </div>
+                <div>
+                    <label>Datum:</label>
+                    <div contenteditable="true" style="border-bottom: 1px solid #333; min-width: 150px; padding: 5px;">[Datum]</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    ${state.mitLohn && state.mitarbeiterAnzahl ? `
+    <script>
+        // Kuchendiagramm erstellen
+        const canvas = document.getElementById('pieChart');
+        const ctx = canvas.getContext('2d');
+        const fibuAnteil = ${fibu};
+        const lohnAnteil = ${lohn};
+        const total = fibuAnteil + lohnAnteil;
+        
+        const fibuProzent = (fibuAnteil / total) * 100;
+        const lohnProzent = (lohnAnteil / total) * 100;
+        
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = 80;
+        
+        // Finanzbuchhaltung (Blau)
+        ctx.beginPath();
+        ctx.fillStyle = '#1e3a8a';
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, 0, (fibuAnteil / total) * 2 * Math.PI);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Lohnbuchhaltung (Orange)
+        ctx.beginPath();
+        ctx.fillStyle = '#fb923c';
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, (fibuAnteil / total) * 2 * Math.PI, 2 * Math.PI);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Legende
+        ctx.font = '12px sans-serif';
+        ctx.fillStyle = '#1e3a8a';
+        ctx.fillRect(20, canvas.height - 40, 15, 15);
+        ctx.fillStyle = '#333';
+        ctx.fillText('Fibu: ' + fibuProzent.toFixed(0) + '%', 40, canvas.height - 28);
+        
+        ctx.fillStyle = '#fb923c';
+        ctx.fillRect(20, canvas.height - 20, 15, 15);
+        ctx.fillStyle = '#333';
+        ctx.fillText('Lohn: ' + lohnProzent.toFixed(0) + '%', 40, canvas.height - 8);
+    </script>
+    ` : ''}
+</body>
+</html>`;
+
+            // Öffne Angebot in neuem Fenster
+            const printWindow = window.open('', '_blank', 'width=900,height=1200');
+            
+            if (!printWindow || printWindow.closed || typeof printWindow.closed === 'undefined') {
+                alert('⚠️ Popup-Blocker aktiv!\n\nBitte erlauben Sie Popups für diese Seite und versuchen Sie es erneut.');
+            } else {
+                printWindow.document.write(angebotHTML);
+                printWindow.document.close();
+            }
+        });>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Angebot - ${firmenname}</title>
+    <style>
+        @media print {
+            body { margin: 0; }
+            @page { margin: 1.5cm; }
+            .no-print { display: none !important; }
+            [contenteditable] { border: none !important; background: transparent !important; }
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20mm;
+            background: white;
+        }
+        [contenteditable] {
+            border: 1px dashed #ccc;
+            padding: 2px 4px;
+            border-radius: 3px;
+            min-height: 20px;
+        }
+        [contenteditable]:hover {
+            background: #f0f9ff;
+            border-color: #3b82f6;
+        }
+        [contenteditable]:focus {
+            outline: 2px solid #3b82f6;
+            background: white;
+        }
+        .edit-hint {
+            color: #3b82f6;
+            font-size: 0.75em;
+            font-style: italic;
+            margin-left: 5px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #1e3a8a;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .company-info {
+            text-align: right;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .company-info strong {
+            color: #1e3a8a;
+            font-size: 1.2em;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .recipient {
+            margin: 30px 0;
+        }
+        .recipient strong {
+            display: block;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        .meta-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 30px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .meta-info div {
+            font-size: 0.9em;
+        }
+        .meta-info strong {
+            color: #1e3a8a;
+        }
+        h1 {
+            color: #1e3a8a;
+            font-size: 1.8em;
+            margin: 30px 0 20px 0;
+        }
+        h2 {
+            color: #1e3a8a;
+            font-size: 1.3em;
+            margin: 20px 0 15px 0;
+        }
+        .intro {
+            margin: 20px 0;
+            line-height: 1.8;
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+        .bewertung {
+            background: #eff6ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+            border-left: 4px solid #1e3a8a;
+        }
+        .explanation-box {
+            background: #fef3c7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #f59e0b;
+            font-size: 0.95em;
+        }
+        .explanation-box strong {
+            color: #92400e;
+        }
+        .kriterien-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .kriterien-header {
+            font-weight: bold;
+            padding: 10px;
+            background: #1e3a8a;
+            color: white;
+            border-radius: 5px 5px 0 0;
+        }
+        .kriterien-row {
+            padding: 10px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .kriterien-row:last-child {
+            border-bottom: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .zehntel-box {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: center;
+            border: 2px solid #1e3a8a;
+        }
+        .zehntel-box .label {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .zehntel-box .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        .preise {
+            margin: 30px 0;
+        }
+        .price-overview {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .preis-table {
+            flex: 2;
+        }
+        .preis-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .preis-table th {
+            background: #1e3a8a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .preis-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .preis-table tr:last-child td {
+            border-bottom: none;
+        }
+        .preis-table .total-row {
+            background: #f8f9fa;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .preis-table .total-row td {
+            padding: 15px 12px;
+            border-top: 2px solid #1e3a8a;
+        }
+        .highlight-preis {
+            color: #1e3a8a;
+            font-size: 1.2em;
+        }
+        .pie-chart-container {
+            flex: 1;
+            text-align: center;
+        }
+        .pie-chart-container canvas {
+            max-width: 200px;
+            max-height: 200px;
+        }
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            font-size: 0.85em;
+            color: #666;
+        }
+        .footer strong {
+            display: block;
+            margin-bottom: 10px;
+            color: #1e3a8a;
+            font-size: 1.1em;
+        }
+        .footer ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .footer li {
+            margin: 5px 0;
+        }
+        .agb-notice {
+            background: #fef3c7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+            border-left: 4px solid #f59e0b;
+        }
+        .agb-notice strong {
+            color: #92400e;
+            font-size: 1.1em;
+        }
+        .agb-notice a {
+            color: #1e3a8a;
+            text-decoration: underline;
+        }
+        .unterschriften {
+            margin-top: 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .unterschrift {
+            text-align: center;
+        }
+        .unterschrift-line {
+            border-top: 2px solid #333;
+            margin: 50px 0 10px 0;
+        }
+        .unterschrift-info {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        .unterschrift-info div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .unterschrift-info label {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .print-button:hover {
+            background: #1e40af;
+        }
+        .edit-mode-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #3b82f6;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            z-index: 999;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        .status-green { background: #d1fae5; color: #065f46; }
+        .status-yellow { background: #fef3c7; color: #92400e; }
+        .status-red { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <div class="no-print edit-mode-banner">
+        📝 BEARBEITUNGSMODUS - Klicken Sie auf die blauen Bereiche um Text zu bearbeiten
+    </div>
+    
+    <button class="print-button no-print" onclick="window.print()">🖨️ Drucken / Als PDF speichern</button>
+
+    <div class="header">
+        <div class="logo-section">
+            <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" rx="15" fill="#1e3a8a"/>
+                <circle cx="35" cy="35" r="20" fill="white"/>
+                <circle cx="55" cy="55" r="15" fill="#fb923c"/>
+            </svg>
+            <div>
+                <strong style="font-size: 1.5em; color: #1e3a8a;">Bilancor</strong>
+                <div style="color: #666;">Buchhaltungsbüro für Selbständige & Unternehmer</div>
+            </div>
+        </div>
+        <div class="company-info">
+            <strong>Bilancor GmbH</strong>
+            Richard-Ermisch-Str. 7<br>
+            10247 Berlin<br>
+            Tel: +49 15565509949<br>
+            anfrage@bilancor.de<br>
+            <small style="display: block; margin-top: 10px;">
+            HRB 279439 B<br>
+            Geschäftsführer: Carsten Lebtig
+            </small>
+        </div>
+    </div>
+
+    <div class="recipient">
+        <strong>${firmenname}</strong>
+        ${<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -726,12 +1357,12 @@
         };
 
         const lohnStaffeln = [
-            { bis: 5, preis: 16.75 },
-            { bis: 10, preis: 16 },
-            { bis: 20, preis: 15.25 },
-            { bis: 30, preis: 14.5 },
-            { bis: 40, preis: 13.75 },
-            { bis: 999, preis: 13.5 }
+            { bis: 5, preisMin: 14.00, preisMax: 19.50 },
+            { bis: 10, preisMin: 13.50, preisMax: 18.50 },
+            { bis: 20, preisMin: 13.00, preisMax: 17.50 },
+            { bis: 30, preisMin: 12.50, preisMax: 16.50 },
+            { bis: 40, preisMin: 12.00, preisMax: 15.50 },
+            { bis: 999, preisMin: 12.00, preisMax: 15.00 }
         ];
 
         let state = {
@@ -866,10 +1497,15 @@
             const fibu = preisTabelle[gewaehltesStufe][preisIndex] || 0;
 
             let lohn = 0;
+            let lohnProMA = 0;
             if (state.mitLohn && state.mitarbeiterAnzahl) {
                 const anzahl = parseInt(state.mitarbeiterAnzahl);
                 const staffel = lohnStaffeln.find(s => anzahl <= s.bis);
-                lohn = staffel ? anzahl * staffel.preis : 0;
+                if (staffel) {
+                    // Verwende Durchschnitt der Preisspanne
+                    lohnProMA = (staffel.preisMin + staffel.preisMax) / 2;
+                    lohn = anzahl * lohnProMA;
+                }
             }
 
             const gesamt = fibu + lohn;
